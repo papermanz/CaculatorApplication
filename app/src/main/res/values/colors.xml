@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#F6D186</color>
+    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorAccent">#03DAC5</color>
+    <color name="trắng">#fcf8f3</color>
+    <color name="xanh">#a4c5c6</color>
+    <color name="xanh_đậm">#3b6978</color>
+</resources>
