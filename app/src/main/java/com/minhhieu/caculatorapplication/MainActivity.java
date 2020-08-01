@@ -8,170 +8,126 @@ import android.view.View;
 import android.view.inputmethod.BaseInputConnection;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
-    private EditText edtNumber;
-    private TextView tvResult;
+import net.objecthunter.exp4j.Expression;
+import net.objecthunter.exp4j.ExpressionBuilder;
 
-    private Button btnnumber0;
-    private Button btnnumber1;
-    private Button btnnumber2;
-    private Button btnnumber3;
-    private Button btnnumber4;
-    private Button btnnumber5;
-    private Button btnnumber6;
-    private Button btnnumber7;
-    private Button btnnumber8;
-    private Button btnnumber9;
+public class MainActivity extends AppCompatActivity {
+    private TextView screen;
+    private String display="";
+    private EditText inputtext;
+    private TextView displaytext;
+    private String currentOperator="";
+    private String result="";
 
-    private Button btnCong;
-    private Button btnTru;
-    private Button btnNhan;
-    private Button btnChia;
 
-    private Button btnPoint;
-    private Button btnResult;
-    private Button btnClear;
-    private Button btnClearAll;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Wiget();
-        setEventClickViews();
-    }
-    public void Wiget(){
 
-        tvResult = findViewById(R.id.tv_result);
-        edtNumber = findViewById(R.id.edt_input);
+        Button deletevar = (Button) findViewById(R.id.btnclear);
+        deletevar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                deletenumber();
+            }
+        });
 
-        btnnumber0 = findViewById(R.id.btn0);
-        btnnumber1 = findViewById(R.id.btn1);
-        btnnumber2 = findViewById(R.id.btn2);
-        btnnumber3 = findViewById(R.id.btn3);
-        btnnumber4 = findViewById(R.id.btn4);
-        btnnumber5 = findViewById(R.id.btn5);
-        btnnumber6 = findViewById(R.id.btn6);
-        btnnumber7 = findViewById(R.id.btn7);
-        btnnumber8 = findViewById(R.id.btn8);
-        btnnumber9 = findViewById(R.id.btn9);
 
-        btnCong = findViewById(R.id.btncong);
-        btnTru = findViewById(R.id.btntru);
-        btnNhan = findViewById(R.id.btnnhan);
-        btnChia = findViewById(R.id.btnchia);
-        btnResult = findViewById(R.id.btnresult);
-
-        btnClear = findViewById(R.id.btnclear);
-        btnClearAll = findViewById(R.id.btnclearall);
-        btnPoint = findViewById(R.id.btnpoint);
-
+        screen = (TextView)findViewById(R.id.edt_input);
+        screen.setText(display);
+        inputtext = findViewById(R.id.edt_input);
+        displaytext = findViewById(R.id.tv_result);
     }
 
-    public void setEventClickViews(){
-
-        btnnumber0.setOnClickListener(this);
-        btnnumber1.setOnClickListener(this);
-        btnnumber2.setOnClickListener(this);
-        btnnumber3.setOnClickListener(this);
-        btnnumber4.setOnClickListener(this);
-        btnnumber5.setOnClickListener(this);
-        btnnumber6.setOnClickListener(this);
-        btnnumber7.setOnClickListener(this);
-        btnnumber8.setOnClickListener(this);
-        btnnumber9.setOnClickListener(this);
-
-        btnCong.setOnClickListener(this);
-        btnTru.setOnClickListener(this);
-        btnNhan.setOnClickListener(this);
-        btnChia.setOnClickListener(this);
-        btnResult.setOnClickListener(this);
-
-        btnClear.setOnClickListener(this);
-        btnClearAll.setOnClickListener(this);
-        btnPoint.setOnClickListener(this);
-
+    private void appendToLast(String str) {
+        this.inputtext.getText().append(str);
     }
 
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()){
-            case R.id.btn0:
-                //TO DO
-                edtNumber.append("0");
-                break;
-            case R.id.btn1:
-                //TO DO
-                edtNumber.append("1");
-                break;
-            case R.id.btn2:
-                edtNumber.append("2");
-                break;
-            case R.id.btn3:
-                edtNumber.append("3");
-                break;
-            case R.id.btn4:
-                edtNumber.append("4");
-                break;
-            case R.id.btn5:
-                edtNumber.append("5");
-                break;
-            case R.id.btn6:
-                edtNumber.append("6");
-                break;
-            case R.id.btn7:
-                edtNumber.append("7");
-                break;
-            case R.id.btn8:
-                edtNumber.append("8");
-                break;
-            case R.id.btn9:
-                edtNumber.append("9");
-                break;
-            case R.id.btncong:
-                edtNumber.append("+");
-                break;
-            case R.id.btntru:
-                edtNumber.append("-");
-                break;
-            case R.id.btnnhan:
-                edtNumber.append("x");
-                break;
-            case R.id.btnchia:
-                edtNumber.append("/");
-                break;
-            case R.id.btnclear:
-                /*String numberAfterRemove = deleteNumber(edtNumber.getText().toString());
-                edtNumber.setText(numberAfterRemove);*/
-                //cách tối ưu gọi ra phím backspace trên bàn phím di động
-                BaseInputConnection textFieldInputConnection = new BaseInputConnection(edtNumber, true);
-                textFieldInputConnection.sendKeyEvent(new KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_DEL));
-                break;
-            case R.id.btnclearall:
-                edtNumber.setText("");
-                break;
-            case R.id.btnpoint:
-                edtNumber.append(".");
-                break;
-            case R.id.btnresult:
-                int numberA =Integer.parseInt(String.valueOf(edtNumber.getText()));
-                break;
-            default:
-                break;
+    //click vào số
+    public void onClickNumber(View v) {
+        Button b = (Button) v;
+        display += b.getText();
+        appendToLast(display);
+        display="";
+    }
+    // click vào phép tính
+    public void onClickOperator(View v) {
+        Button b = (Button) v;
+        display += b.getText();
+        if(endsWithOperatore())
+        {
+            replace(display);
+            currentOperator = b.getText().toString();
+            display = "";
+        }
+        else {
+            appendToLast(display);
+            currentOperator = b.getText().toString();
 
-
-
-
-
+            display = "";
         }
 
     }
-    // hàm xử lí nút clear
-    /*public String deleteNumber(String number){
-        int lenght = number.length();
-        String temp = number.substring(0,lenght-1); // lấy các kí tự từ đầu đến gần cuối của chuỗi, ex: hieu -> hie
-        return temp;
-    }*/
+    //AC xoá màn hình
+    public void onClearButton(View v) {
+        inputtext.getText().clear();
+        displaytext.setText("");
+    }
+    //nút del xoá kí tự cuối của chuỗi
+    public void deletenumber() {
+        this.inputtext.getText().delete(getinput().length() - 1, getinput().length());
+    }
+
+    private String getinput() {
+        return this.inputtext.getText().toString();
+    }
+
+    //fix bug toán tử ở cuối chuỗi
+    private boolean endsWithOperatore() {
+        return getinput().endsWith("+") || getinput().endsWith("-") || getinput().endsWith("/") || getinput().endsWith("x");
+    }
+
+    private void replace(String str) {
+        inputtext.getText().replace(getinput().length() - 1, getinput().length(), str);
+    }
+
+    private double operate(String a,String b,String cp)
+    {
+        switch(cp) {
+            case "+": return Double.valueOf(a) + Double.valueOf(b);
+            case "-": return Double.valueOf(a) - Double.valueOf(b);
+            case "x": return Double.valueOf(a) * Double.valueOf(b);
+            case "\u00F7": return Double.valueOf(a) / Double.valueOf(b);
+            default: return -1;
+        }
+    }
+    // trường hợp UI x -> *
+    public void equalresult(View v) {
+        String input = getinput();
+
+        if(!endsWithOperatore()) {
+
+            if (input.contains("x")) {
+                input = input.replaceAll("x", "*");
+            }
+
+            if (input.contains("\u00F7")) {
+                input = input.replaceAll("\u00F7", "/");
+            }
+
+            Expression expression = new ExpressionBuilder(input).build();
+            double result = expression.evaluate();
+
+            displaytext.setText(String.valueOf(result));
+        }
+        else displaytext.setText("");
+
+        System.out.println(result);
+    }
+
 }
